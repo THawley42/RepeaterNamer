@@ -16,18 +16,22 @@ import java.util.Objects;
 // filtering. this happens when the user send a specific request.
 public class SendAllToRepeater {
     public SendAllToRepeater (MontoyaApi api, List<HttpRequestResponse> requestResponseList){
-        if(requestResponseList != null){
+        //if the sitemap has requests and the settings are set, continue with the main functionality
+        if(requestResponseList != null && api.persistence().preferences().getBoolean("Repeaternamer.settings.init")!= null){
             int totalRtoRepeater = 0;
+            //if more than one request is sent, filter the list then send them to repeater
             if (requestResponseList.size()>1){
                 List<HttpRequest>requestList = ResponseFiltering(requestResponseList, api);
                 for (HttpRequest request : requestList) {
                     new SendToRepeater(api, request);
                     totalRtoRepeater++;
                 }
+                //if there's only one request, just sent it to repeater, no filtering
             }else{
                 new SendToRepeater(api, requestResponseList.get(0).request());
                 totalRtoRepeater++;
             }
+            //log # of request sent to the extension output
             api.logging().logToOutput(totalRtoRepeater + " Requests sent to Repeater.");
         }
     }
@@ -37,8 +41,8 @@ public class SendAllToRepeater {
     //It filters out:
     // requests that have no reply or get a 404 response.
     // requests that are out of scope.
-    // everything after the first request for resources with these extensions (.png, .svg, .js, .gif, .jpg, .png, .css).
     // and all requests that are duplicates of another request based on method and path.
+    // and depending on settings, certain file extension based checks are done, either checked per extension+path or just per extension
     private List<HttpRequest> ResponseFiltering(List<HttpRequestResponse> requestResponseList, MontoyaApi api) {
 
         int totalRequests = requestResponseList.size();
@@ -66,29 +70,48 @@ public class SendAllToRepeater {
         while(itrR.hasNext()){
 
             HttpRequest request = itrR.next();
-
-            if (!Objects.equals(request.fileExtension(), "") && ".png, .svg, .js, .gif, .jpg, .png, .css".contains(request.fileExtension())) {
-
-                if(extensionFlag.contains(request.fileExtension())){
-                    itrR.remove();
-                    totalRRemoved++;
+            //if the method is in the method list continue, otherwise skip
+            if (api.persistence().preferences().getString("Repeaternamer.settings.Method").contains(request.method())){
+                //if the settings to check the extensions are on, there is an extension,
+                // the extension is in the settings list of extensions to filter, and the extension isn't in the
+                //settings list of extensions not to filter, continue, otherwise more to the method path filter
+                if (api.persistence().preferences().getBoolean("Repeaternamer.settings.OneOf") && !Objects.equals(request.fileExtension(), "") && api.persistence().preferences().getString("Repeaternamer.settings.Extention").contains(request.fileExtension()) && !api.persistence().preferences().getString("Repeaternamer.settings.ExtentionKeep").contains(request.fileExtension())) {
+                    //if the setting for getting the requests with extensions is set to get them per path, then record
+                    // path - filename + extension and do filtering on that,
+                    // otherwise just record extensions seen and do filtering on that
+                    if(api.persistence().preferences().getBoolean("Repeaternamer.settings.EachPath")){
+                        String path = request.pathWithoutQuery().substring(0, request.pathWithoutQuery().lastIndexOf('/'));
+                        if(extensionFlag.contains(path+request.fileExtension())){
+                            itrR.remove();
+                            totalRRemoved++;
+                        }else {
+                            extensionFlag.add(path+request.fileExtension());
+                        }
+                    }else{
+                        if(extensionFlag.contains(request.fileExtension())){
+                            itrR.remove();
+                            totalRRemoved++;
+                        }else {
+                            extensionFlag.add(request.fileExtension());
+                        }
+                    }
+                //this filters based on method + path, if the program has already sent a request with the same
+                    // method + path then it skips the current request
                 }else {
-                    extensionFlag.add(request.fileExtension());
+
+                    if(pathFlag.contains(request.method() + request.pathWithoutQuery()) || !api.persistence().preferences().getString("Repeaternamer.settings.ExtentionKeep").contains(request.fileExtension())) {
+                        itrR.remove();
+                        totalRRemoved++;
+                    }else {
+                        //extensionFlag.clear();
+                        pathFlag.add(request.method() + request.pathWithoutQuery());
+                    }
+
                 }
-
-            }else {
-
-                if(pathFlag.contains(request.method() + request.pathWithoutQuery())) {
-                    itrR.remove();
-                    totalRRemoved++;
-                }else {
-                    extensionFlag.clear();
-                    pathFlag.add(request.method() + request.pathWithoutQuery());
-                }
-
             }
         }
 
+        //logging the amount of request filtered to extension output
         api.logging().logToOutput("Filtering of Sitemap done.");
         api.logging().logToOutput("Filtered " + totalRRemoved + " out of the " + totalRequests + " total requests acquired from the Sitemap.");
 
