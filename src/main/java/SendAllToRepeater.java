@@ -70,12 +70,11 @@ public class SendAllToRepeater {
         while(itrR.hasNext()){
 
             HttpRequest request = itrR.next();
-            //if the method is in the method list continue, otherwise skip
-            if (api.persistence().preferences().getString("Repeaternamer.settings.Method").contains(request.method())){
+            //if the method is in the method list and not in the file extensions to skip continue , otherwise skip
+            if (api.persistence().preferences().getString("Repeaternamer.settings.Method").contains(request.method()) && (Objects.equals(request.fileExtension(), "") || !api.persistence().preferences().getString("Repeaternamer.settings.ExtentionDrop").contains(request.fileExtension()))){
                 //if the settings to check the extensions are on, there is an extension,
-                // the extension is in the settings list of extensions to filter, and the extension isn't in the
-                //settings list of extensions not to filter, continue, otherwise more to the method path filter
-                if (api.persistence().preferences().getBoolean("Repeaternamer.settings.OneOf") && !Objects.equals(request.fileExtension(), "") && api.persistence().preferences().getString("Repeaternamer.settings.Extention").contains(request.fileExtension()) && !api.persistence().preferences().getString("Repeaternamer.settings.ExtentionKeep").contains(request.fileExtension())) {
+                // the extension is in the settings list of extensions to filter continue, otherwise more to the method path filter
+                if (api.persistence().preferences().getBoolean("Repeaternamer.settings.OneOf") && !Objects.equals(request.fileExtension(), "") && api.persistence().preferences().getString("Repeaternamer.settings.Extention").contains(request.fileExtension()) ) {
                     //if the setting for getting the requests with extensions is set to get them per path, then record
                     // path - filename + extension and do filtering on that,
                     // otherwise just record extensions seen and do filtering on that
@@ -99,7 +98,7 @@ public class SendAllToRepeater {
                     // method + path then it skips the current request
                 }else {
 
-                    if(pathFlag.contains(request.method() + request.pathWithoutQuery()) || !api.persistence().preferences().getString("Repeaternamer.settings.ExtentionKeep").contains(request.fileExtension())) {
+                    if(pathFlag.contains(request.method() + request.pathWithoutQuery())) {
                         itrR.remove();
                         totalRRemoved++;
                     }else {
@@ -108,6 +107,9 @@ public class SendAllToRepeater {
                     }
 
                 }
+            }else{
+                itrR.remove();
+                totalRRemoved++;
             }
         }
 

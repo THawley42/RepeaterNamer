@@ -20,7 +20,7 @@ public class RepeaterNamer implements BurpExtension{
         if(api.persistence().preferences().getBoolean("Repeaternamer.settings.init")== null){
             api.persistence().preferences().setBoolean("Repeaternamer.settings.init", true);
             api.persistence().preferences().setString("Repeaternamer.settings.Method", "GET, POST, PUT, DELETE, PATCH");//
-            api.persistence().preferences().setString("Repeaternamer.settings.ExtentionKeep", ".html");//
+            api.persistence().preferences().setString("Repeaternamer.settings.ExtentionDrop", "");//
             api.persistence().preferences().setString("Repeaternamer.settings.Extention", ".png, .svg, .js, .gif, .jpg, .png, .css");//
             api.persistence().preferences().setBoolean("Repeaternamer.settings.OneOf", true);//
             api.persistence().preferences().setBoolean("Repeaternamer.settings.EachPath", true);//

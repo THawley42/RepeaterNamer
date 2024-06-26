@@ -26,6 +26,8 @@ public class SettingsTab extends JPanel {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 0;
+        c.ipadx = 20;
+        c.ipady = 25;
         this.add(new JLabel("Methods to send to repeater"), c);
 
         // Grid row 0, col 1: text
@@ -33,6 +35,8 @@ public class SettingsTab extends JPanel {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 1;
         c.gridy = 0;
+        c.ipadx = 20;
+        c.ipady = 10;
         this.add(textFieldMethod, c);
 
         // Grid row 0, col 2: button
@@ -41,6 +45,8 @@ public class SettingsTab extends JPanel {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 2;
         c.gridy = 0;
+        c.ipadx = 20;
+        c.ipady = 10;
         this.add(addMethodButton, c);
     }
     private void addSecondRow() {
@@ -50,21 +56,27 @@ public class SettingsTab extends JPanel {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 1;
-        this.add(new JLabel("File extensions to send to repeater"), c);
+        c.ipadx = 20;
+        c.ipady = 25;
+        this.add(new JLabel("File extensions to never send to repeater"), c);
 
         // Grid row 0, col 1: text
-        JTextField textFieldExKeep = new JTextField(api.persistence().preferences().getString(SettingsTab.SETTINGS_KEY+"ExtentionKeep"), 50);
+        JTextField textFieldExKeep = new JTextField(api.persistence().preferences().getString(SettingsTab.SETTINGS_KEY+"ExtentionDrop"), 50);
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 1;
         c.gridy = 1;
+        c.ipadx = 20;
+        c.ipady = 10;
         this.add(textFieldExKeep, c);
 
         // Grid row 0, col 2: button
         JButton addButtonExKeep = new JButton("Save File Extensions");
-        addButtonExKeep.addActionListener(e -> api.persistence().preferences().setString(SettingsTab.SETTINGS_KEY+"ExtentionKeep", textFieldExKeep.getText()));
+        addButtonExKeep.addActionListener(e -> api.persistence().preferences().setString(SettingsTab.SETTINGS_KEY+"ExtentionDrop", textFieldExKeep.getText()));
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 2;
         c.gridy = 1;
+        c.ipadx = 20;
+        c.ipady = 10;
         this.add(addButtonExKeep, c);
     }
     private void addThirdRow() {
@@ -74,6 +86,8 @@ public class SettingsTab extends JPanel {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 2;
+        c.ipadx = 20;
+        c.ipady = 25;
         this.add(new JLabel("File extensions to send to repeater with the below restrictions"), c);
 
         // Grid row 0, col 1: text
@@ -81,6 +95,8 @@ public class SettingsTab extends JPanel {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 1;
         c.gridy = 2;
+        c.ipadx = 20;
+        c.ipady = 10;
         this.add(textFieldEx, c);
 
         // Grid row 0, col 2: button
@@ -89,6 +105,8 @@ public class SettingsTab extends JPanel {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 2;
         c.gridy = 2;
+        c.ipadx = 20;
+        c.ipady = 10;
         this.add(addButtonEx, c);
     }
     private void addFourthRow() {
@@ -99,21 +117,27 @@ public class SettingsTab extends JPanel {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 3;
+        c.ipadx = 20;
+        c.ipady = 20;
         this.add(checkOneOf, c);
 
         // Grid row 0, col 1: text
-        JCheckBox checkEachPath = new JCheckBox("Send 1 of each extension from each path", api.persistence().preferences().getBoolean(SettingsTab.SETTINGS_KEY+"EachPath"));
+        JCheckBox checkEachPath = new JCheckBox("Send 1 of each extension from each path (requires the previous checkbox)", api.persistence().preferences().getBoolean(SettingsTab.SETTINGS_KEY+"EachPath"));
         checkEachPath.addItemListener(e -> api.persistence().preferences().setBoolean(SettingsTab.SETTINGS_KEY+"EachPath", e.getStateChange()==ItemEvent.SELECTED));
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 1;
         c.gridy = 3;
+        c.ipadx = 20;
+        c.ipady = 20;
         this.add(checkEachPath, c);
 
-        JCheckBox checkMostParam = new JCheckBox("Send the request with the most parameters (wip)", api.persistence().preferences().getBoolean(SettingsTab.SETTINGS_KEY+"MostParam"));
+        JCheckBox checkMostParam = new JCheckBox("Send the request with the most parameters (WIP)", api.persistence().preferences().getBoolean(SettingsTab.SETTINGS_KEY+"MostParam"));
         checkMostParam.addItemListener(e -> api.persistence().preferences().setBoolean(SettingsTab.SETTINGS_KEY+"MostParam", e.getStateChange()==ItemEvent.SELECTED));
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 2;
         c.gridy = 3;
+        c.ipadx = 20;
+        c.ipady = 20;
         this.add(checkMostParam, c);
     }
     private void debugRow() {
@@ -123,7 +147,7 @@ public class SettingsTab extends JPanel {
         addButtonlog.addActionListener(e -> {
             api.logging().logToOutput("Repeaternamer.settings.init: "+api.persistence().preferences().getBoolean("Repeaternamer.settings.init"));
             api.logging().logToOutput("Repeaternamer.settings.Method: "+api.persistence().preferences().getString("Repeaternamer.settings.Method"));//
-            api.logging().logToOutput("Repeaternamer.settings.ExtentionKeep: "+api.persistence().preferences().getString("Repeaternamer.settings.ExtentionKeep"));//
+            api.logging().logToOutput("Repeaternamer.settings.ExtentionDrop: "+api.persistence().preferences().getString("Repeaternamer.settings.ExtentionDrop"));//
             api.logging().logToOutput("Repeaternamer.settings.Extention: "+api.persistence().preferences().getString("Repeaternamer.settings.Extention"));//
             api.logging().logToOutput("Repeaternamer.settings.OneOf: "+api.persistence().preferences().getBoolean("Repeaternamer.settings.OneOf"));//
             api.logging().logToOutput("Repeaternamer.settings.EachPath: "+api.persistence().preferences().getBoolean("Repeaternamer.settings.EachPath"));//
@@ -133,12 +157,14 @@ public class SettingsTab extends JPanel {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 4;
+        c.ipadx = 10;
+        c.ipady = 10;
         this.add(addButtonlog, c);
         JButton addButtonclear= new JButton("Delete settings");
         addButtonclear.addActionListener(e -> {
             api.persistence().preferences().deleteBoolean("Repeaternamer.settings.init");
             api.persistence().preferences().deleteString("Repeaternamer.settings.Method");//
-            api.persistence().preferences().deleteString("Repeaternamer.settings.ExtentionKeep");//
+            api.persistence().preferences().deleteString("Repeaternamer.settings.ExtentionDrop");//
             api.persistence().preferences().deleteString("Repeaternamer.settings.Extention");//
             api.persistence().preferences().deleteBoolean("Repeaternamer.settings.OneOf");//
             api.persistence().preferences().deleteBoolean("Repeaternamer.settings.EachPath");//
@@ -149,12 +175,14 @@ public class SettingsTab extends JPanel {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 1;
         c.gridy = 4;
+        c.ipadx = 10;
+        c.ipady = 10;
         this.add(addButtonclear, c);
         JButton addButtonreset= new JButton("Reset settings");
         addButtonreset.addActionListener(e -> {
             api.persistence().preferences().setBoolean("Repeaternamer.settings.init", true);
             api.persistence().preferences().setString("Repeaternamer.settings.Method", "GET, POST, PUT, DELETE, PATCH");//
-            api.persistence().preferences().setString("Repeaternamer.settings.ExtentionKeep", ".html");//
+            api.persistence().preferences().setString("Repeaternamer.settings.ExtentionDrop", "");//
             api.persistence().preferences().setString("Repeaternamer.settings.Extention", ".png, .svg, .js, .gif, .jpg, .png, .css");//
             api.persistence().preferences().setBoolean("Repeaternamer.settings.OneOf", true);//
             api.persistence().preferences().setBoolean("Repeaternamer.settings.EachPath", true);//
@@ -165,6 +193,8 @@ public class SettingsTab extends JPanel {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 2;
         c.gridy = 4;
+        c.ipadx = 10;
+        c.ipady = 10;
         this.add(addButtonreset, c);
     }
     private static final String SETTINGS_KEY = "Repeaternamer.settings.";
